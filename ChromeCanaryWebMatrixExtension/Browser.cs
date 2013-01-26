@@ -1,4 +1,9 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright file="Browser.cs" company="CompanyName">
+//     CopyRight(c) Peter Tate, 2012.
+// </copyright>
+//-----------------------------------------------------------------------
+using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Drawing;
@@ -8,31 +13,67 @@ using Microsoft.WebMatrix.Extensibility;
 
 namespace ChromeCanaryBrowser 
 {
+    /// <summary>
+    /// Implements an instance of the Chrome Canary Browser
+    /// </summary>
     [Export(typeof(IBrowser))]
-    class Browser : IBrowser
+    public class Browser : IBrowser
     {
+        /// <summary>
+        /// The path to the Chrome Canary Install location
+        /// </summary>
         private const string BrowserPath = @"%localappdata%\Google\Chrome SxS\Application\";
+
+        /// <summary>
+        /// The name of the Chrome Canary executable
+        /// </summary>
         private const string ExeName = "chrome.exe";
+
+        /// <summary>
+        /// The Display name in WebMatrix
+        /// </summary>
         private const string CanaryDisplayName = "Google Chrome Canary";
+
+        /// <summary>
+        /// The canary download URL if the user does not have Chrome Canary installed
+        /// </summary>
         private const string CanaryDownloadUrl = @"https://www.google.com/intl/en/chrome/browser/canary.html";
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Browser"/> class.
+        /// </summary>
         public Browser()
         {
         }
 
-        private bool IsCanaryInstalled()
+        /// <summary>
+        /// Gets the short name displayed on menus.
+        /// </summary>
+        public string DisplayName
         {
-            var path = GetCommand();
-            return File.Exists(path);
+            get { return CanaryDisplayName; }
         }
 
-        private static string GetCommand()
+        /// <summary>
+        /// Gets the image to be displayed on the menu and overlaid on run button.
+        /// </summary>
+        public System.Windows.Media.ImageSource Image
         {
-            var installPath = Path.Combine(BrowserPath, ExeName);
-            var path = Environment.ExpandEnvironmentVariables(installPath);
-            return path;
+            get { return Utility.ConvertBitmapToImageSource(Resources.ChromeCanary); }
         }
 
+        /// <summary>
+        /// Gets the un-localized ID of the browser.
+        /// </summary>
+        public string Name
+        {
+            get { return ExeName; }
+        }
+
+        /// <summary>
+        /// Called to cause the browser to display the specified URL in Chrome Canary.
+        /// </summary>
+        /// <param name="url">The location to browse to.</param>
         public void Browse(string url)
         {
             if (this.IsCanaryInstalled())
@@ -55,19 +96,27 @@ namespace ChromeCanaryBrowser
             }
         }
 
-        public string DisplayName
+        /// <summary>
+        /// Gets the full command line to start the browser.
+        /// </summary>
+        /// <returns>The command line as a string</returns>
+        private static string GetCommand()
         {
-            get { return CanaryDisplayName; }
+            var installPath = Path.Combine(BrowserPath, ExeName);
+            var path = Environment.ExpandEnvironmentVariables(installPath);
+            return path;
         }
 
-        public System.Windows.Media.ImageSource Image
+        /// <summary>
+        /// Determines whether Chrome Canary is installed.
+        /// </summary>
+        /// <returns>
+        ///   <c>true</c> if Chrome Canary is installed; otherwise, <c>false</c>.
+        /// </returns>
+        private bool IsCanaryInstalled()
         {
-            get { return Utility.ConvertBitmapToImageSource(Resources.ChromeCanary); }
-        }
-
-        public string Name
-        {
-            get { return ExeName; }
+            var path = GetCommand();
+            return File.Exists(path);
         }
     }
 }
